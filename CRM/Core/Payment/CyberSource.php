@@ -3,7 +3,7 @@
 /**
  * CyberSource payment gateway integration
  * @package CRM
- * @Source code and original idea taken from Jason Yee. Modified, upgraded and fixed by Victor Forsythe 
+ * @Source code and original idea taken from Jason Yee. Modified, upgraded and fixed by Victor Forsythe
  * (support@upleaf.com) for newer versions of civicrm.
  * www.upleaf.com
  */
@@ -73,7 +73,6 @@ class CRM_Core_Payment_CyberSource extends CRM_Core_Payment {
     if (!$response) return self::error(curl_errno($submit), curl_error($submit));
     // close cURL
     curl_close($submit);
-
     // response parsing code taken from ubercart's cybersource code
     if (preg_match_all('`name=".+" value=".+"`', $response, $pairs) > 0) {
       for ($i = 0; $i < count($pairs[0]); $i++) {
@@ -82,6 +81,8 @@ class CRM_Core_Payment_CyberSource extends CRM_Core_Payment {
       }
 
       if ($nvp['decision'] == 'ACCEPT') {
+        $params['trxn_id'] = $nvp['requestID'];//'trxn_id' is varchar(255) field. returned value is length 37
+        $params['trxn_result_code'] = $nvp['reconciliationID'] ;
         return $params;
       }
       else {
@@ -94,7 +95,7 @@ class CRM_Core_Payment_CyberSource extends CRM_Core_Payment {
     else {
       return self::error('No Response', 'CyberSource failed to send a response.');
     }
-  
+
   } // end doDirectPayment
 
   function _getCyberSourceFields() {
@@ -125,12 +126,12 @@ class CRM_Core_Payment_CyberSource extends CRM_Core_Payment {
     $amount = ($this->_getParam('amount'))? $this->_getParam('amount') : '0.00';
     $orderPage_transactionType = $this->_transactionType;
     $currency = $this->_currency;
-    $merchantID = getMerchantID();
-    $timestamp = getmicrotime();
+    $merchantID = $this->getMerchantID();
+    $timestamp = cybersouce_hop_getmicrotime();
     $data = $merchantID . $amount . $currency . $timestamp . $orderPage_transactionType;
-    $pub =  getSharedSecret();
-    $serialNumber = getSerialNumber();
-    $pub_digest = hopHash($data, $pub);
+    $pub =  $this->getSharedSecret();
+    $serialNumber = $this->getSerialNumber();
+    $pub_digest = cybersource_hop_hopHash($data, $pub);
 
     // set CyberSource info
     $fields['orderPage_transactionType'] = $this->_transactionType;
@@ -144,7 +145,6 @@ class CRM_Core_Payment_CyberSource extends CRM_Core_Payment {
 
     // other transaction info
     $fields['orderNumber'] = $this->_getParam('invoiceID');
-
     return $fields;
   } // end _getCyberSourceFields
 
@@ -166,7 +166,7 @@ class CRM_Core_Payment_CyberSource extends CRM_Core_Payment {
    * @param string $field
    * @param mixed $value
    * @return bool false if value is not a scalar, true if successful
-   */ 
+   */
   function _setParam($field, $value) {
     if (!is_scalar($value)) {
       return false;
@@ -176,11 +176,24 @@ class CRM_Core_Payment_CyberSource extends CRM_Core_Payment {
     }
   }
 
-  /**                                              
+  /**
    * need this because it's declared as abstract in parent class
    */
   function checkConfig() {
-    return null;
+    $errorMsg = array();
+    if ( empty( $this->_paymentProcessor['user_name'] ) ) {
+      $errorMsg[] = ' ' . ts( 'ssl_merchant_id is not set for this payment processor' );
+    }
+
+    if ( empty( $this->_paymentProcessor['url_site'] ) ) {
+      $errorMsg[] = ' ' . ts( 'URL is not set for this payment processor' );
+    }
+
+    if ( ! empty( $errorMsg ) ) {
+      return implode( '<p>', $errorMsg );
+      } else {
+        return null;
+      }
   }
 
   function &error($errorCode = null, $errorMessage = null) {
@@ -193,4 +206,15 @@ class CRM_Core_Payment_CyberSource extends CRM_Core_Payment {
     return $e;
   }
 
+  function getMerchantID(){
+    return $this->_paymentProcessor['user_name'];
+  }
+
+  function getSerialNumber(){
+    return $this->_paymentProcessor['signature_label'];
+  }
+
+  function getSharedSecret(){
+    return $this->_paymentProcessor['password'];
+  }
 } // end class
