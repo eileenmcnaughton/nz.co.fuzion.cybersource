@@ -143,7 +143,6 @@ $cs_fields = array(
 
   // no error, exit here
   if ($nvp['decision'] == 'ACCEPT') return false; 
-dpm($cs_codes);
   // if we have an existing  code, return the messages
   if (is_array($cs_codes[$nvp['ccAuthReply_reasonCode']])) {
     return $cs_codes[$nvp['ccAuthReply_reasonCode']];
