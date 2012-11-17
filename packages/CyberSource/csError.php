@@ -3,10 +3,14 @@
 /* csError.php
  * This file is just a function for CyberSource error code lookups
  */
-
+function csError($nvp) {
 // define CyberSource error codes as listed in:
 //  http://apps.cybersource.com/library/documentation/sbc/SOP_UG/SOP_UG.pdf
 $cs_codes = array(
+  '102' => array(
+    'csError' => 'Your transaction has been declined',
+    'csMessage' => 'Please check your credit card number and expiry date were entered correctly.',
+  ),
   '150' => array(
     'csError' => 'Error: General System Failure.',
     'csMessage' => 'An error occured. Please try again later.',
@@ -136,10 +140,10 @@ $cs_fields = array(
 );  
 
 // $nvp is the array of name-value pairs sent in the CyberSource response
-function csError($nvp) {
+
   // no error, exit here
   if ($nvp['decision'] == 'ACCEPT') return false; 
-
+dpm($cs_codes);
   // if we have an existing  code, return the messages
   if (is_array($cs_codes[$nvp['ccAuthReply_reasonCode']])) {
     return $cs_codes[$nvp['ccAuthReply_reasonCode']];
