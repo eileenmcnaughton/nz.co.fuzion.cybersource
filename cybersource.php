@@ -26,7 +26,6 @@ class nz_co_fuzion_cybersource extends CRM_Core_Payment {
     $this->_processorName = ts('CyberSource');
     $this->_currency = 'usd';
     $this->_transactionType = 'sale';
-    $config =& CRM_Core_Config::singleton();
   }
 
   /**
