@@ -156,7 +156,7 @@ function cybersource_hop_csL($x, $n) {
 #### Copyright 2003, CyberSource Corporation.  All rights reserved.
 ####
 
-function cybersouce_hop_getmicrotime(){
+function cybersource_hop_getmicrotime(){
   list($usec, $sec) = explode(" ",microtime());
   $usec = (int)((float)$usec * 1000);
   while (strlen($usec) < 3) { $usec = "0" . $usec; }
@@ -183,7 +183,7 @@ function cybersource_hop_getSerialNumber() { return "copy the value from your ve
 
 function cybersource_hop_InsertMapSignature($assocArray) {
   $assocArray['merchantID'] = cybersource_hop_getMerchantID();
-  $assocArray['orderPage_timestamp'] = cybersouce_hop_getmicrotime();
+  $assocArray['orderPage_timestamp'] = cybersource_hop_getmicrotime();
   $assocArray['orderPage_version'] = "7";
   $assocArray['orderPage_serialNumber'] = cybersource_hop_getSerialNumber();
   $fields = NULL;
@@ -212,7 +212,7 @@ function cybersource_hop_InsertSignature($amount, $currency) {
   if(!isset($amount)){ $amount = "0.00"; }
   if(!isset($currency)){ $currency = "usd"; }
   $merchantID = cybersource_hop_getMerchantID();
-  $timestamp = cybersouce_hop_getmicrotime();
+  $timestamp = cybersource_hop_getmicrotime();
   $data = $merchantID . $amount . $currency . $timestamp;
   $pub = cybersource_hop_getSharedSecret();
   $serialNumber = cybersource_hop_getSerialNumber();
@@ -231,7 +231,7 @@ function cybersource_hop_InsertSignature3($amount, $currency, $orderPage_transac
   if(!isset($amount)){ $amount = "0.00"; }
   if(!isset($currency)){ $currency = "usd"; }
   $merchantID = cybersource_hop_getMerchantID();
-  $timestamp = cybersouce_hop_getmicrotime();
+  $timestamp = cybersource_hop_getmicrotime();
   $data = $merchantID . $amount . $currency . $timestamp . $orderPage_transactionType;
   $pub = cybersource_hop_getSharedSecret();
   $serialNumber = cybersource_hop_getSerialNumber();

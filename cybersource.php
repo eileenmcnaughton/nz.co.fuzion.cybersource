@@ -126,7 +126,7 @@ class nz_co_fuzion_cybersource extends CRM_Core_Payment {
     $orderPage_transactionType = $this->_transactionType;
     $currency = $this->_currency;
     $merchantID = $this->getMerchantID();
-    $timestamp = cybersouce_hop_getmicrotime();
+    $timestamp = cybersource_hop_getmicrotime();
     $data = $merchantID . $amount . $currency . $timestamp . $orderPage_transactionType;
     $pub =  $this->getSharedSecret();
     $serialNumber = $this->getSerialNumber();
