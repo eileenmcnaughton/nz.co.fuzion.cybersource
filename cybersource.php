@@ -63,9 +63,10 @@ class nz_co_fuzion_cybersource extends CRM_Core_Payment {
     curl_setopt($submit, CURLOPT_POST, true);
     curl_setopt($submit, CURLOPT_POSTFIELDS, implode('&', $postFields));
     curl_setopt($submit, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL') ? 2 : 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
     curl_setopt($submit, CURLOPT_NOPROGRESS, 1);
-    curl_setopt($submit, CURLOPT_FOLLOWLOCATION, 0);
+    curl_setopt($submit, CURLOPT_FOLLOWLOCATION, FALSE);
     $response = curl_exec($submit);
 
     // handle the response
